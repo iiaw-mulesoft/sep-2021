@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="e6837b3f-b105-44a1-a2d8-f23503d404f0" file="application.${mule.env}.properties" /> 
+	<import doc:name="Import"
+		doc:id="8c150fcb-f7e9-4cf6-a2e6-af74abbd74ca"
+		file="commons-exception-handling.xml" />
+	<import doc:name="Import"
+		doc:id="151cda2c-67fa-4c95-8441-00da8ec0bede"
+		file="commons-logging.xml" />
+	<http:listener-config name="HTTP_Listener_config"
+		doc:name="HTTP Listener config"
+		doc:id="df0f0268-add9-4c1e-870e-621383b3ca37" basePath="/api/">
+		<http:listener-connection host="0.0.0.0"
+			port="8081" />
+	</http:listener-config>
+	<import doc:name="Import"
+		doc:id="b13a9e21-3195-43bb-aadf-c02c22a810df"
+		file="commons-http-config.xml" />
+	<import doc:name="Import" doc:id="789ba0ea-3312-4965-94f9-998fff0c6056" file="commons-variable.xml" />
+	<import doc:name="Import" doc:id="75c449a0-adfd-4059-a1b8-a6b4bbdb075a" file="commons-secure-properties.xml"/>
+	<import doc:name="Import" doc:id="4fa4384c-20b4-4c91-bb4e-55baf314ae66" file="commons-notification.xml" />
+</mule>

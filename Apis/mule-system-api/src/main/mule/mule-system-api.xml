@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd 
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
+	<sub-flow name="systemApi_getResource_subflow" doc:id="6accd733-5a3c-4e88-ac78-dc98cd1787ca" >
+		<set-variable value="${rest.host}" doc:name="Set Host" doc:id="888f32ca-fd83-4202-901d-af671c486ffc" variableName="host" />
+		<set-variable value="${restApi.resourcePath}" doc:name="Set Path" doc:id="77432ae1-a0f8-4996-bd6e-3a459e6c0078" variableName="resourcePath" />
+		<flow-ref doc:name="systemApi_getResource" doc:id="38b2bcc7-8ac9-4c34-bfcd-3407c02dbcd4" name="systemApi_getResource" />
+	</sub-flow>
+	<sub-flow name="notification_subflow" doc:id="7c11b996-373e-43fb-a3d5-d5a8bae7ad0d" >
+		<set-variable value='"Notification test"' doc:name="Set Notfication" doc:id="16a50d5b-8996-4f50-bf71-a0c1366b00c2" variableName="notification" />
+		<set-variable value="${api.name}-${mule.env}" doc:name="Set apiName" doc:id="a165efae-d0a7-4ef2-b9cd-e9bf4d1c9d28" variableName="apiName"/>
+		<flow-ref doc:name="commons-notification" doc:id="645e721b-05a9-4bf2-bb89-aa93923cdfa7" name="commons-notification" />
+	</sub-flow>
+	<flow name="mule-system-apiFlow"
+		doc:id="052423fd-3b1b-4818-8b4b-8e34f9d2acad">
+		<http:listener doc:name="Listener"
+			doc:id="2c741d0b-9d73-4d11-8f38-9e803fe2a9a9"
+			config-ref="HTTP_Listener_config" path="/*" >
+			<http:response statusCode="#[vars.httpStatus default 200]" >
+				<http:headers ><![CDATA[#[output application/json
+---
+
+CorrelationId : vars.correlationId]]]></http:headers>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 502]" >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+				<http:headers ><![CDATA[#[output application/json
+---
+
+CorrelationId : vars.correlationId]]]></http:headers>
+			</http:error-response>
+		</http:listener>
+		<flow-ref doc:name="commons_initApiKitMainFlowSharedVariables" doc:id="d68545d2-c98e-406a-a379-853f6fd00bf3" name="commons_initApiKitMainFlowSharedVariables" />
+		<flow-ref doc:name="systemApi_getResource" doc:id="40381f60-18fc-44ed-b8d3-937d6b354ea1" name="systemApi_getResource_subflow" />
+		<ee:transform doc:name="Response Transform" doc:id="a259a336-c77a-4518-9637-8c1482de2873" >
+			<ee:message >
+				<ee:set-payload resource="dwl/response.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="email" ><![CDATA[%dw 2.0
+output application/java
+---
+payload[1].email]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Notification" doc:id="da10e684-ad4a-490f-a1fe-8b984e09af99" name="notification_subflow" />
+		<logger level="INFO" doc:name="Logger" doc:id="2e2bdcb2-fd8f-4b2a-949f-8516872d54b4" message="Retrieved email :: #[vars.email]"/>
+		<error-handler ref="Global_Exception_Strategy" />
+	</flow>
+</mule>

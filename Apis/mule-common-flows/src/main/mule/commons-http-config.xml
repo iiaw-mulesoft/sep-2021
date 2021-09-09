@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config
+		name="process-api-httpsRequestConfig"
+		doc:name="HTTP Request configuration">
+		<http:request-connection host="#[vars.host]" port="${rest.port}" protocol="HTTPS"/>
+	</http:request-config>
+	<http:request-config
+		name="system-api-httpsRequestConfig"
+		doc:name="HTTP Request configuration">
+		<http:request-connection port="${rest.port}" host="#[vars.host]" protocol="HTTPS"/>
+	</http:request-config>
+	<sub-flow name="systemApi_getResource">
+		<logger
+			message="About to invoke: GET #[vars.resourcePath] System API..."
+			category="org.ebay.mule.commons.apis.http" level="INFO"
+			doc:name="Logger" />
+		<http:request method="GET" doc:name="System API - Get Resource"
+			config-ref="system-api-httpsRequestConfig" path="#[vars.resourcePath]">
+		</http:request>
+		<choice doc:name="Have result?"
+			doc:id="a465e8f0-7aef-447d-b00f-466807c405f1">
+			<when expression="#[attributes.statusCode == 404]">
+				<set-variable value="#[attributes.statusCode]"
+					doc:name="Set Status to 404"
+					doc:id="966eb08d-a653-4de6-9604-a994d8ba382f"
+					variableName="statusCode" />
+				<set-payload value="#['{}']" mimeType="application/json"
+					doc:name="Set to empty" />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger"
+					doc:id="5f6833a5-5842-4088-b326-686026c918be"
+					message="System API: GET #[vars.resourcePath] returned status: #[attributes.statusCode]"
+					category="org.cap.mule.commons.apis.http" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+ 	<sub-flow name="systemApi_createResource">
+		<set-variable value="System API: POST #[vars.resourcePath] System API with payload:" doc:name="Variable logPayloadMessage" doc:id="25796161-1368-4abe-99b2-7a4a9b1500f3" variableName="logPayloadMessage" />
+		<flow-ref doc:name="Optimized Logger" doc:id="ace0a40d-7028-416b-bac1-47f105fe4898" name="commons_info_logJsonPayload" />
+		<http:request method="POST" doc:name="System API - Create Resource"
+			config-ref="system-api-httpsRequestConfig" path="#[vars.resourcePath]"/>
+	</sub-flow>
+	<sub-flow name="systemApi_updateResource">
+		<set-variable value="System API: PUT #[vars.resourcePath] System API with payload:" doc:name="Variable logPayloadMessage" doc:id="e0ca9b77-706f-4911-842c-e5728d599864" variableName="logPayloadMessage" />
+		<flow-ref doc:name="Optimized Logger" doc:id="ea903e17-618e-44e7-a8af-a416a7be952e" name="commons_info_logJsonPayload" />
+		<http:request method="PUT" doc:name="System API - Update Resource"
+			config-ref="system-api-httpsRequestConfig" path="#[vars.resourcePath]"/>
+	</sub-flow>
+	<sub-flow name="systemApi_removeResource">
+		<set-variable value="System API: DELETE #[vars.resourcePath] System API with payload:" doc:name="Variable logPayloadMessage" doc:id="b786e1ce-8552-48da-8f56-3a44b7cb0858" variableName="logPayloadMessage" />
+		<flow-ref doc:name="Optimized Logger" doc:id="95e3db4a-12f7-4b53-a748-91a93f086e5f" name="commons_info_logJsonPayload" />
+		<http:request method="DELETE" doc:name="System API - Remove Resource"
+			config-ref="system-api-httpsRequestConfig" path="#[vars.resourcePath]"/>
+	</sub-flow>
+</mule>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+	<sub-flow name="commons_initApiKitMainFlowSharedVariables" doc:id="b7465063-9515-469b-9a87-aa3635b335c8" >
+		<set-variable value="${log.payload.info.enabled}" doc:name="Set Variable logPayloadInfoEnabled" doc:id="b979c068-12ff-4954-a0d2-9ca87a6d2d92" variableName="logPayloadInfoEnabled"/>
+		<ee:transform doc:name="Set Payload" doc:id="6c2d0752-82de-4309-9b95-010b7affe851" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="payloadType" ><![CDATA[%dw 2.0
+output application/json
+---
+typeOf(payload)]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="${mule.env}" doc:name="Variable - set muleEnv" doc:id="1d287211-5b82-4ef6-9669-ff4e144d17cf" variableName="muleEnv"/>
+		<set-variable value="#[attributes.requestUri]" doc:name="Variable Request URI" doc:id="c4f75094-2ea3-430b-8adb-a8a6cec75061" variableName="apiPath"/>
+		<ee:transform doc:name="Set Correlation Id" doc:id="a37a2bbb-1473-463a-9dc5-db249b94ff83">
+			<ee:message>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="correlationId" ><![CDATA[%dw 2.0
+output application/java
+var uniqueId = do {
+    var uuidVar = uuid()
+    ---
+    uuidVar
+}
+---
+if (isEmpty(attributes.headers.correlationId))
+	uniqueId
+else
+	attributes.headers.correlationId]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="commons_trackEvent" doc:id="17728c87-c09f-4ef8-9b7e-03edd509b12e" name="commons_trackEvent"/>
+	</sub-flow>
+	<sub-flow name="commons_trackEvent" doc:id="e6d8476d-9db0-44c0-9776-d53ce39c714e" >
+		<tracking:transaction doc:name="Set Transaction Id" doc:id="4b4fcb08-8e7d-4790-9d34-6793ad8b2bae" id="custom-business-event"/>
+		<flow-ref doc:name="commons_info_logJsonPayload" doc:id="55a34538-b2e5-4b0d-b618-5366b5acf6f3" name="commons_info_logJsonPayload"/>
+		<tracking:custom-event doc:name="Custom Business Event" doc:id="c57f8f46-8b51-4d8c-80c2-6703efb3d018" event-name="trackRequestChannel">
+			<tracking:meta-data key="id" value="#[correlationId]" />
+			<tracking:meta-data key="apiName" value="${api.name}" />
+			<tracking:meta-data key="apiVersion" value="${api.version}" />
+			<tracking:meta-data key="apiLayer" value="${api.layer}" />
+			<tracking:meta-data key="method" value="#[attributes.method]" />
+			<tracking:meta-data key="environment" value="${mule.env}" />
+			<tracking:meta-data key="path" value="#[attributes.listenerPath]" />
+		</tracking:custom-event>
+	</sub-flow>
+</mule>

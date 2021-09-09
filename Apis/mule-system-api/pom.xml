@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<parent>
+		<groupId>c35aff09-178c-44c4-bf15-eb724d575fd9</groupId>
+		<artifactId>mule-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../mule-parent/pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>c35aff09-178c-44c4-bf15-eb724d575fd9</groupId>
+	<artifactId>mule-system-api</artifactId>
+	<version>${mule.artifact.project.version}</version>
+	<packaging>mule-application</packaging>
+
+	<name>mule-system-api</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<build>
+		<plugins>
+        	<plugin>
+                <groupId>com.mulesoft.munit.tools</groupId>
+                <artifactId>munit-maven-plugin</artifactId>
+                <version>${munit.version}</version>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <coverage>
+                        <runCoverage>true</runCoverage>
+                        <formats>
+                            <format>html</format>
+                        </formats>
+                    </coverage>
+                </configuration>
+            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+<!-- 				<configuration>
+					<skip>true</skip>
+				</configuration> -->
+			</plugin>
+		</plugins>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/munit</directory>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>${anypoint.org.id}</groupId>
+			<artifactId>mule-common-flows</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+    	<dependency>
+            <groupId>com.mulesoft.modules</groupId>
+            <artifactId>mule-secure-configuration-property-module</artifactId>
+            <version>1.2.3</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+		<dependency>
+		  <groupId>org.mule.modules</groupId>
+		  <artifactId>mule-scripting-module</artifactId>
+		  <version>1.1.0</version> <!-- or newer -->
+		  <classifier>mule-plugin</classifier>
+		</dependency>
+    	<dependency>
+            <groupId>com.mulesoft.connectors</groupId>
+            <artifactId>mule-cloudhub-connector</artifactId>
+            <version>1.0.1</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    </dependencies>
+</project>

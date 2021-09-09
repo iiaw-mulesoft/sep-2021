@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+		<sub-flow name="commons_maskJsonPayload" doc:id="097c26e7-0e7e-4fed-9e78-b77ae2290644" >
+		<choice doc:name="Check JSON payload is empty or not" doc:id="af98e1cc-3f07-42ff-9b16-a969d9c894db" >
+			<when expression="#[(write(payload, 'application/json') startsWith(&quot;{&quot;)) as Boolean&#10;or&#10;(write(payload, 'application/json') startsWith(&quot;[&quot;)) as Boolean&#10;or &#10;(!(isEmpty(payload))) as Boolean]">
+				<choice doc:name="Check payload" doc:id="c6ebf92e-4782-443d-b377-20609e71d4d3" >
+					<when expression='#[(vars.payloadType == "Object") or (vars.payloadType == "Array")]'>
+						<ee:transform doc:name="Mask Sensitive Fields" doc:id="1f903cd7-8af4-47d0-a3de-8c7ecac5dee8">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::util::Values
+import * from dw::core::Strings
+output application/json
+fun lastNameMask(lastName) = lastName[0] ++ "***"
+fun phoneMask(x) =  "(###)-###-" ++ x[-4 to -1]
+fun emailMask(email) = "***@" ++ substringAfterLast(email, "@")
+type Currency = String{format: "\$#,###.00"}
+
+---
+payload mask field("firstName") with upper($)
+        mask field("lastName") with lastNameMask($)
+        mask field("salary") with $ as Currency
+        mask field("phone") with phoneMask($)
+        mask field("email") with emailMask($)]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<logger level="INFO" doc:name="Logger" doc:id="4e2c88f0-bfaf-43c7-8060-29bb91ad4c7b" message="[${api.layer} API] [CorrelationId: #[vars.correlationId]] [#[vars.logPayloadMessage] with payload: #[payload]]" category="org.mycompany.mule.commons.error.tracking"/>
+					</when>
+					<otherwise >
+						<logger level="DEBUG" doc:name="Logger" doc:id="94ac9db0-477f-4e40-9b83-c238a27ae27a" message="Payload is not JSON" category="org.mycompany.mule.commons.error.tracking"/>
+					</otherwise>
+				</choice>
+			</when>
+			<otherwise >
+				<logger level="DEBUG" doc:name="Logger" doc:id="fbe4d9d4-dac0-4cf5-8b85-e2d5c24e267b" message="Payload is NULL or not Valid JSON" category="org.mycompany.mule.commons.error.tracking"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="commons_info_logJsonPayload" doc:id="0765e63d-a423-4d62-9168-8117ce5125f0" >
+		<choice doc:name="Drop message when payload log is not enabled" doc:id="c428ac12-e9ca-4f66-8aec-c406c5c67ae0" >
+			<when expression='#[vars.logPayloadInfoEnabled == "true"]'>
+				<flow-ref doc:name="commons_maskJsonPayload" doc:id="394f73a4-c3ad-40fa-8e0e-f6f78d2f4cc0" name="commons_maskJsonPayload"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="0d3a6c3c-4522-46ec-9644-c5d688a43eb2" message="[#[vars.correlationId]] ${api.layer} API: #[vars.logPayloadMessage] but skipping payload logging." category="org.mycompany.mule.commons.error.tracking"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	
+	
+</mule>

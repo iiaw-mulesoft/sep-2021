@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
+
+	<cloudhub:config name="CloudHub_Config" doc:name="CloudHub Config" doc:id="93063fd8-2a62-41df-8a74-1d163be577b3" >
+		<cloudhub:connection username="${secure::notification.username}" password="${secure::notification.password}" environment="${notification.environment}"/>
+	</cloudhub:config>
+	<sub-flow name="commons-notification" doc:id="6bc38c96-89e4-427a-be70-4e7303256c4a" >
+		<logger level="INFO" doc:name="Logger" doc:id="aeb05d0a-c04e-45cc-a7b7-1c6722288f75" message="#[vars.notification] sent to #[vars.apiName] Username: ${secure::notification.username}"/>
+		<cloudhub:create-notification domain="#[vars.apiName]" doc:name="Notification" doc:id="92f2d282-509e-411c-b813-91b085a13447" config-ref="CloudHub_Config" priority="INFO" transactionId="uuid()">
+			<cloudhub:message ><![CDATA[#[vars.notification]]]></cloudhub:message>
+		</cloudhub:create-notification>
+	</sub-flow>
+</mule>

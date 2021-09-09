@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	   <error-handler name="Global_Exception_Strategy" doc:id="d0bcefa8-8b8a-4dc5-9d7f-3cb4bebccc3c" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="690b70db-bd47-436e-a955-f72d7af50f5d" type="HTTP:BAD_REQUEST">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="9276d28e-c12c-4389-b801-f2b867a2670c" variableName="errorMessage"/>
+			<flow-ref doc:name="commons_bad_request_response" doc:id="d49c2e76-eccb-4aed-9460-ea3dbd038e09" name="commons_bad_request_response"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1960427b-7bc3-4530-945b-64ee278bdcf0" type="HTTP:UNAUTHORIZED">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="aa5df7da-b4ac-409b-8ea6-7fb8f508ecd1" variableName="errorMessage"/>
+			<flow-ref doc:name="Bad Gateway Response" doc:id="cbe18f5b-34ee-47dd-bb2a-b3b0526c0b85" name="commons_bad_gateway"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3ebcc2a4-0bf8-43c9-b67d-c65ad485954d" type="HTTP:FORBIDDEN">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="fad3cdbc-600b-451a-bfb7-8b18542e136a" variableName="errorMessage"/>
+			<flow-ref doc:name="Bad Gateway Response" doc:id="1269ce40-c20c-4a6a-9617-135253515100" name="commons_bad_gateway"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="0f688f15-4613-4bf1-9896-1ca869777528" type="HTTP:NOT_FOUND">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="d6b29eb2-1a0d-4855-bfdb-8ab6c25561f3" variableName="errorMessage"/>
+			<flow-ref doc:name="commons_resource_not_found_response" doc:id="1182ae57-a388-4edf-96d0-9f9735865202" name="commons_resource_not_found_response"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cd31d279-d2eb-4b25-8924-aaca9998772d" type="HTTP:PARSING">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="2a532707-05c1-4062-a371-9bc8e82c5a6b" variableName="errorMessage"/>
+			<flow-ref doc:name="Bad Gateway Response" doc:id="35440682-3749-4f66-8d83-e71644b302b7" name="commons_bad_gateway"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c190f389-8e74-458c-8aac-3d710e286afb" type="HTTP:INTERNAL_SERVER_ERROR">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="7014694f-99d8-47d2-9c4a-7138127d8c5a" variableName="errorMessage"/>
+			<flow-ref doc:name="Bad Gateway Response" doc:id="8fe489d1-1c09-4f51-b454-d2d06f10773f" name="commons_internal_server_error_response"/>
+		</on-error-propagate>
+<!-- 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3d4d0418-4c63-4dbc-911b-9bc1859ebbda" type="APIKIT:BAD_REQUEST">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="a832e8d7-3684-43e8-8065-c1f248e00499" variableName="errorMessage"/>
+			<flow-ref doc:name="commons_bad_request_response" doc:id="73cddbe1-c6d7-48f6-b622-8126ce1c265a" name="commons_bad_request_response"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="abc9cadf-7593-41bf-90f6-9afd09f69d33" type="APIKIT:UNAUTHORIZED">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="b5d0997f-6b55-451c-abbf-6419608662cd" variableName="errorMessage"/>
+			<flow-ref doc:name="Bad Gateway Response" doc:id="2bed58b4-1145-4f73-aaaf-d55028861ada" name="commons_bad_gateway"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="21bb1bd7-5aab-49fb-ba9b-bfabcf71ac35" type="APIKIT:FORBIDDEN">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="f3144064-0695-47a5-a82e-b340708f6a76" variableName="errorMessage"/>
+			<flow-ref doc:name="Bad Gateway Response" doc:id="35936269-546f-4d8a-9da5-033cbdb75a2b" name="commons_bad_gateway"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7b3805ef-b88d-4b4a-b611-ce7a80cf4cbe" type="APIKIT:NOT_FOUND">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="f0cbcb7a-5841-4ec5-bde2-ae161a6f6ff1" variableName="errorMessage"/>
+			<flow-ref doc:name="commons_resource_not_found_response" doc:id="6c44834a-ccb6-44eb-9c5a-690d738a8eb2" name="commons_resource_not_found_response"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7d132252-6a43-461a-818b-551c128dd8cd" type="APIKIT:PARSING">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="dd3ac0fa-d346-4728-999e-6bc9d8716bb1" variableName="errorMessage"/>
+			<flow-ref doc:name="Bad Gateway Response" doc:id="78c4136b-59cc-4d2d-b81c-9330d36873d7" name="commons_bad_gateway"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f557cf11-be93-45e0-8e22-84d75a803ddf" type="APIKIT:INTERNAL_SERVER_ERROR">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="0d7b4c5d-49a6-43cf-b26d-fdc022b0a632" variableName="errorMessage"/>
+			<flow-ref doc:name="Bad Gateway Response" doc:id="fdc69cc7-7f9f-4cee-9a29-7c45689b739f" name="commons_internal_server_error_response"/>
+		</on-error-propagate> -->
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b48cbadd-a25f-4044-acc9-219e316eb897" when="[error.errorType.namespace == 'HTTP'">
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="eeb2a843-4935-4b6e-97f1-478c56ecd7ed" variableName="errorMessage" />
+			<flow-ref doc:name="Bad Gateway Response" doc:id="9145b243-9fff-46e1-a6df-abc57ee02f23" name="commons_internal_server_error_response"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d213a4f5-2e16-423f-a2f1-623fc948ab0c" type="ANY">
+			<logger level="INFO" doc:name="Logger" doc:id="c1e39a23-4371-4a00-9bb9-b73b8f845326" message="I'm in any"/>
+			<set-variable value="Upstream service did not authorize the request." doc:name="Set Error Message" doc:id="f78fba53-bf8c-4aed-b3da-3ce2b7dcc3dd" variableName="errorMessage" />
+			<flow-ref doc:name="Bad Gateway Response" doc:id="796794a1-d2b7-448b-bd65-0969d2c312e1" name="commons_internal_server_error_response"/>
+		</on-error-propagate>
+	</error-handler>
+	<sub-flow name="commons_bad_request_response">
+        <set-variable value="400" doc:name="Set Status" doc:id="7055c590-49e6-4326-bb3f-1a6b1270bf6e" variableName="httpStatus"/>
+		<set-payload value="BAD_REQUEST" doc:name="Set Error Code" mimeType="application/java"/>
+        <flow-ref name="commons_prepare_json_error_response" doc:name="Prepare Error Response"/>
+    </sub-flow>
+    <sub-flow name="commons_resource_not_found_response" doc:id="5ffa6286-6eab-4ce4-bfbb-06e6741e30ab" >
+		<set-variable value="404" doc:name="Set Status" doc:id="0ef46227-0d08-4fb6-8e7d-8a905347733f" variableName="httpStatus"/>
+		<set-payload value="RESOURCE_NOT_FOUND" doc:name="Set Error Code" doc:id="dfe08890-d1c8-4708-9e5a-6fae3bdb5e86" />
+		<flow-ref doc:name="commons_prepare_short_json_error_response" doc:id="7b3bb1a2-b3ae-4f8c-931b-dceb9d37dff5" name="commons_prepare_short_json_error_response"/>
+	</sub-flow>
+    <sub-flow name="commons_method_not_allowed_response" doc:id="142f2585-ea0b-4dca-8e69-af7ce319bf91" >
+		<set-variable value="404" doc:name="Set Status" doc:id="41518b83-9565-43e5-9dd3-c7fd92ddfc6e" variableName="httpStatus"/>
+		<set-payload value="RESOURCE_NOT_FOUND" doc:name="Set Error Code" doc:id="46c31fe5-4ea1-41cf-866d-765fd44ef3e3" />
+		<flow-ref doc:name="commons_prepare_short_json_error_response" doc:id="7c8772b7-e9bd-43ec-a6db-c2eed137d8c1" name="commons_prepare_short_json_error_response"/>
+	</sub-flow>
+    <sub-flow name="commons_not_acceptable_response" doc:id="ab631555-2394-423f-9173-37c48de2a63f" >
+		<set-variable value="404" doc:name="Set Status" doc:id="f4b65b99-8c08-44f9-b85d-080fd5ebff54" variableName="httpStatus"/>
+		<set-payload value="RESOURCE_NOT_FOUND" doc:name="Set Error Code" doc:id="904f1628-f423-4bf4-8361-5bc5742c10cd" />
+		<flow-ref doc:name="commons_prepare_short_json_error_response" doc:id="52ffa63a-884e-44d0-bc6e-67b152679f82" name="commons_prepare_short_json_error_response"/>
+	</sub-flow>
+    <sub-flow name="commons_conflict_response" doc:id="fdd3a678-c2f3-4ffc-9575-17dc90d883dc" >
+		<set-variable value="404" doc:name="Set Status" doc:id="e06a4c5e-fc5f-48d2-88df-55b953710337" variableName="httpStatus"/>
+		<set-payload value="RESOURCE_NOT_FOUND" doc:name="Set Error Code" doc:id="39f1d4e1-bf0f-4513-93fd-17666e125b45" />
+		<flow-ref doc:name="commons_prepare_short_json_error_response" doc:id="008340e3-2694-43d1-9b2c-a88fd1e32f08" name="commons_prepare_short_json_error_response"/>
+	</sub-flow>
+    <sub-flow name="commons_unsupported_media_type_response" doc:id="0dfad8e2-c03c-49bd-bb1d-da191b893bb6" >
+		<set-variable value="404" doc:name="Set Status" doc:id="8a9e4275-169d-440b-95ba-47ddb940111b" variableName="httpStatus"/>
+		<set-payload value="RESOURCE_NOT_FOUND" doc:name="Set Error Code" doc:id="ac7ca54b-515c-4ec9-8403-baabb20ff8f2" />
+		<flow-ref doc:name="commons_prepare_short_json_error_response" doc:id="7f382d28-6e36-4bfa-87db-d7f76aea892d" name="commons_prepare_short_json_error_response"/>
+	</sub-flow>
+    <sub-flow name="commons_internal_server_error_response" doc:id="10182ce3-42da-494c-b7a3-3a59b8f1bba2" >
+		<set-variable value="404" doc:name="Set Status" doc:id="b8a84969-0b7e-4879-acb0-821e30c7343c" variableName="httpStatus"/>
+		<set-payload value="RESOURCE_NOT_FOUND" doc:name="Set Error Code" doc:id="ef54e6e9-8318-4c8b-a67e-7c75ea40b641" />
+		<flow-ref doc:name="commons_prepare_short_json_error_response" doc:id="f599aa93-3a3f-428a-9d80-920080dfe599" name="commons_prepare_short_json_error_response"/>
+	</sub-flow>
+    <sub-flow name="commons_bad_gateway" doc:id="05097864-1fa3-4846-b604-0c38bdfcef30" >
+		<set-variable value="404" doc:name="Set Status" doc:id="82313431-abc4-4506-8147-5c6292d5d023" variableName="httpStatus"/>
+		<set-payload value="RESOURCE_NOT_FOUND" doc:name="Set Error Code" doc:id="040ad9df-913e-42ed-af11-bb795b2a41bd" />
+		<flow-ref doc:name="commons_prepare_short_json_error_response" doc:id="bd9e37d4-195f-4ddb-bdd8-9cdba2acf729" name="commons_prepare_short_json_error_response"/>
+	</sub-flow>
+	<sub-flow name="commons_prepare_json_error_response">
+        <set-variable variableName="errorRaised" value="#[true]" doc:name="Set Error Raised"/>
+        
+ 		<flow-ref doc:name="commons_logError" doc:id="101fc9d9-a8fc-4928-9d1d-f62ad0ab4a93" name="commons_logError"/>
+		<ee:transform doc:name="commons_createExceptionMessage" doc:id="87200d6e-0f9f-4440-b3b2-01ce397ad359" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json skipNullOn = "everywhere"
+---
+{
+	code: "1",
+	severity: "ERROR",
+	message: if (vars.exceptionCause != null) vars.exceptionCause else vars.exceptionMessage,
+	status: "FAILURE"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    
+</sub-flow>
+	<sub-flow name="commons_prepare_short_json_error_response" doc:id="515da2cb-b1f0-44b7-92ad-c06a20fbbc58" >
+		<set-variable value="#[true]" doc:name="Set Error Raised" doc:id="8bdfbd6b-68e1-4d7b-9325-af1352f934ac" variableName="errorRaised" />
+		<flow-ref doc:name="commons_logError" doc:id="17ba8de9-d15d-4bdd-b15d-a6914c1ffcf2" name="commons_logError"/>
+		<ee:transform doc:name="commons_createShortExceptionMessage" doc:id="908f93a8-f79c-454a-8eba-35a9028973f1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn = "everywhere"
+---
+{
+	status: "FAILURE",
+	message: vars.errorMessage
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="commons_logError" doc:id="50cedd72-5d42-442b-91d6-5fbedf588dfe" >
+		<set-variable value="#[error.description]" doc:name="exceptionSummary" doc:id="c1889edc-b292-4361-8cbf-e1247dda00d1" variableName="exceptionSummary"/>
+		<set-variable value="#[error.errorMessage]" doc:name="exceptionMessage" doc:id="dc12d5c7-d7ae-4d53-bb65-63dcc9e601f3" variableName="exceptionMessage"/>
+		<set-variable value="#[error.cause]" doc:name="exceptionCause" doc:id="778ff427-915d-44c6-adce-d0fdf08489b6" variableName="exceptionCause"/>
+		<logger level="INFO" doc:name="Logger" doc:id="14d8e870-d09f-4e18-b0b6-0f45882fd6ee" message="[Application = ${api.name}:${api.version}] [CorrelationId = #[vars.correlationId]] [Layer = ${api.layer}] [Environment = ${mule.env}] [path=#[vars.apiPath]] [Status=ERROR] Message=#[vars..exceptionCause]"/>
+	</sub-flow>
+	
+</mule>
